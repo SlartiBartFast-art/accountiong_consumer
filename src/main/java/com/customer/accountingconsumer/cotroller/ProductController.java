@@ -10,11 +10,15 @@ import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.MultiValueMap;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.server.ResponseStatusException;
 
 import javax.validation.Valid;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -27,6 +31,7 @@ import static org.springframework.http.HttpStatus.OK;
 @RestController
 @RequestMapping(value = "/template/products")
 @AllArgsConstructor
+@Validated
 public class ProductController {
 
     private RestTemplate restTemplate;
@@ -51,8 +56,9 @@ public class ProductController {
             @RequestParam(value = "sortDir",
                     defaultValue = AppConstant.DEFAULT_SORT_DIRECTION, required = false) String sortDir
     ) {
-        var rsl = restTemplate.getForEntity(AppConstant.API, SockResponse.class, pageNo, pageSize, sortBy, sortDir);
-        return rsl.getBody();
+        return restTemplate.getForEntity
+                (AppConstant.API, SockResponse.class, pageNo, pageSize, sortBy, sortDir)
+                .getBody();
     }
 
     /**
@@ -63,7 +69,7 @@ public class ProductController {
     @GetMapping("/")
     public List<Sock> findAll() {
         return restTemplate.exchange(
-                AppConstant.API,
+                AppConstant.API_ALL,
                 HttpMethod.GET, null, new ParameterizedTypeReference<List<Sock>>() {
                 }
         ).getBody();
@@ -72,49 +78,79 @@ public class ProductController {
     /**
      * Save Sock in DB
      *
-     * @param sock
+     * @param sock Object
      * @return ResponseEntity<Sock>
      */
     @PostMapping("/")
     public ResponseEntity<Sock> save(@Valid @RequestBody Sock sock) {
-        Optional<Sock> rsl = Optional.ofNullable(restTemplate
-                .postForObject(AppConstant.API, sock, Sock.class));
-        if (rsl.isEmpty()) {
+        var rsl = Optional
+                .of(restTemplate.postForEntity(AppConstant.API, sock, Sock.class));
+        if (!rsl.get().hasBody()) {
             throw new ResponseStatusException(
                     HttpStatus.INTERNAL_SERVER_ERROR,
                     "We're sorry, server error, please try again later!");
         }
-        return new ResponseEntity<>(rsl.get(), CREATED);
+        return rsl.get();
     }
 
     /**
-     * получить Паспорт используя его id
+     * Find all products matching the specified parameters
      *
-     * @param id (int) Passport Object int DB
-     * @return ResponseEntity<Passport>
+     * @param coloring   Object Sock
+     * @param operator   not registered; "moreThan"; "lessThan";
+     * @param cottonPart as a percentage
+     * @return ResponseEntity<Sock [ ]>
+     */
+    @GetMapping("/socks")
+    public ResponseEntity<Sock[]> findAllLike(@RequestParam("coloring")
+                                              @NotBlank(message = "Coloring must not be empty!")
+                                                      String coloring,
+                                              @NotBlank(message = "Operator must not be empty!")
+                                              @RequestParam("operator")
+                                                      String operator,
+                                              @RequestParam("cottonPart")
+                                              @NotBlank(message = "CottonPart must not be empty!")
+                                                      String cottonPart) {
+        Optional<ResponseEntity<Sock[]>> rsl = Optional.of(
+                restTemplate.getForEntity(
+                        AppConstant.API_FIND, Sock[].class, coloring, operator, cottonPart
+                ));
+        if (!rsl.get().hasBody()) {
+            throw new ResponseStatusException(
+                    HttpStatus.INTERNAL_SERVER_ERROR,
+                    "We're sorry, server error, please try again later!");
+        }
+        return rsl.get();
+    }
+
+    /**
+     * Get a Sock using its id
+     *
+     * @param id (int) Sock Object int DB
+     * @return ResponseEntity<Sock>
      */
     @GetMapping("/{id}")
-    public ResponseEntity<Sock> findProductById(@PathVariable Long id) {
+    public ResponseEntity<Sock> findProductById(@Size(min = 1) @PathVariable Long id) {
         return restTemplate.getForEntity(AppConstant.API_ID,
                 Sock.class, id);
     }
 
     /**
+     * //todo patch
      * Update one parameter in to Sock
-     *
-     * @param sock
+     * @param sock Object
      * @return ResponseEntity<Sock>
      */
     @PatchMapping("/")
     public ResponseEntity<Sock> patch(@Valid @RequestBody SockDtoPatch sock) {
-        Optional<Sock> rsl = Optional.ofNullable(restTemplate
-                .postForObject(AppConstant.API, sock, Sock.class));
-        if (rsl.isEmpty()) {
+        var rsl = Optional.of(restTemplate
+                .patchForObject(AppConstant.API, sock, Sock.class));
+        if (!rsl.get().hasBody()) {
             throw new ResponseStatusException(
                     HttpStatus.INTERNAL_SERVER_ERROR,
                     "We're sorry, server error, please try again later!");
         }
-        return new ResponseEntity<>(rsl.get(), OK);
+        return rsl.get();
     }
 
     /**
@@ -124,7 +160,7 @@ public class ProductController {
      * @return void
      */
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable int id) {
+    public ResponseEntity<Void> delete(@Size(min = 1) @PathVariable int id) {
         var sock = Optional
                 .ofNullable(restTemplate.getForEntity(AppConstant.API_ID,
                         Sock.class, id).getBody());
@@ -135,19 +171,4 @@ public class ProductController {
         restTemplate.delete(AppConstant.API_ID, id);
         return ResponseEntity.ok().build();
     }
-
-//todo
-//    /**
-//     * find all Sock object which more ---
-//     *
-//     * @return ResponseEntity<List < Sock>>
-//     */
-//    @GetMapping("/unavaliabe")
-//    public ResponseEntity<Sock[]> findByDateExpiretion() {
-//        ResponseEntity<Sock[]> responseEntity = restTemplate.getForEntity(API_UNAVAILIABLE,
-//                Sock[].class);
-//        return responseEntity;
-//    }
-//
-
 }
