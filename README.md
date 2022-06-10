@@ -1,16 +1,20 @@
-# Клиентская часть приложения "Учет товаров"
+# Client part of the application "Accounting for goods"
 
 [![Build Status](https://app.travis-ci.com/SlartiBartFast-art/accountiong_consumer.svg?branch=master)](https://app.travis-ci.com/SlartiBartFast-art/accountiong_consumer)
 ![GitHub top language](https://img.shields.io/github/languages/top/SlartiBartFast-art/accountiong_consumer?logo=java&logoColor=red)
 ![GitHub last commit](https://img.shields.io/github/last-commit/SlartiBartFast-art/accountiong_consumer?logo=github)
 
-part 2 - under construction
+RESTful architecture used
+
+Клиентская часть приложения "Учет товаров"
+
+part 2 - under construction 
 
 part 1  - automated_accounting
 
 ----
 Used technology stack:
-______________________________________________
+
 - Java Core
 - JWT
 - Spring Boot (Web)
