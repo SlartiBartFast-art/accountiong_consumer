@@ -21,36 +21,36 @@ ______________________________________________
 GET - pagination query
 
     - http://localhost:8081/template/product/?pageSize=3&pageNo=1&sortBy=id
-![Image of Arch](https://github.com/SlartiBartFast-art/automated_accounting/blob/master/image/Screenshot_2.jpg)
+![Image of Arch](https://github.com/SlartiBartFast-art/accountiong_consumer/blob/master/image/Screenshot_01.jpg)
 
 
     -http://localhost:8081/template/product/?pageSize=5&pageNo=1&sortBy=id&sortDir=asc
-![Image of Arch](https://github.com/SlartiBartFast-art/automated_accounting/blob/master/image/Screenshot_2.jpg)
+![Image of Arch](https://github.com/SlartiBartFast-art/accountiong_consumer/blob/master/image/Screenshot_02.jpg)
 
 
 GET - all Object List without pagination
   
     - http://localhost:8081/template/product/productsAll
-![Image of Arch](https://github.com/SlartiBartFast-art/automated_accounting/blob/master/image/Screenshot_2.jpg)
+![Image of Arch](https://github.com/SlartiBartFast-art/accountiong_consumer/blob/master/image/Screenshot_03.jpg)
 
 GET - find objects using parameters
 
     - http://localhost:8081/template/product/products?coloring=red&operator=moreThan&cottonPart=90
-![Image of Arch](https://github.com/SlartiBartFast-art/automated_accounting/blob/master/image/Screenshot_2.jpg)
+![Image of Arch](https://github.com/SlartiBartFast-art/accountiong_consumer/blob/master/image/Screenshot_04.jpg)
 
 GET - find Object by id
 
     - http://localhost:8081/template/product/{id}
-![Image of Arch](https://github.com/SlartiBartFast-art/automated_accounting/blob/master/image/Screenshot_2.jpg)
+![Image of Arch](https://github.com/SlartiBartFast-art/accountiong_consumer/blob/master/image/Screenshot_05.jpg)
     
 POST - update Object
 
     - http://localhost:8081/template/product/
-![Image of Arch](https://github.com/SlartiBartFast-art/automated_accounting/blob/master/image/Screenshot_2.jpg)
+![Image of Arch](https://github.com/SlartiBartFast-art/accountiong_consumer/blob/master/image/Screenshot_06.jpg)
 
 DELETE - Object by id
 
     - http://localhost:8081/template/product/{id}
-![Image of Arch](https://github.com/SlartiBartFast-art/automated_accounting/blob/master/image/Screenshot_2.jpg)
+![Image of Arch](https://github.com/SlartiBartFast-art/accountiong_consumer/blob/master/image/Screenshot_07.jpg)
 
        
