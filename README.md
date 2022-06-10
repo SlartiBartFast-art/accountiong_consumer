@@ -1,5 +1,6 @@
 # Клиентская часть приложения "Учет товаров"
 
+[![Build Status](https://app.travis-ci.com/SlartiBartFast-art/accountiong_consumer.svg?branch=master)](https://app.travis-ci.com/SlartiBartFast-art/accountiong_consumer)
 ![GitHub top language](https://img.shields.io/github/languages/top/SlartiBartFast-art/accountiong_consumer?logo=java&logoColor=red)
 ![GitHub last commit](https://img.shields.io/github/last-commit/SlartiBartFast-art/accountiong_consumer?logo=github)
 

@@ -1,0 +1,173 @@
+{
+	"info": {
+		"_postman_id": "89d98fe5-7ec9-44cf-aaa0-3ab624dd93db",
+		"name": "good-consumer",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "19373002"
+	},
+	"item": [
+		{
+			"name": "http://localhost:8081/template/product/",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"id\": 0,\r\n    \"cottonPart\": 70,\r\n    \"quantity\": 25,\r\n    \"color\": {\r\n        \"id\": 0,\r\n        \"coloring\": \"Prizm\"\r\n    }\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8081/template/product/",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8081",
+					"path": [
+						"template",
+						"product",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "http://localhost:8081/template/product/1",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8081/template/product/1",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8081",
+					"path": [
+						"template",
+						"product",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "http://localhost:8081/template/product/2",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8081/template/product/2",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8081",
+					"path": [
+						"template",
+						"product",
+						"2"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "http://localhost:8081/template/product/?pageSize=3&pageNo=1&sortBy=id",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8081/template/product/?pageNo=1&sortBy=id&pageSize=3",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8081",
+					"path": [
+						"template",
+						"product",
+						""
+					],
+					"query": [
+						{
+							"key": "pageNo",
+							"value": "1"
+						},
+						{
+							"key": "sortBy",
+							"value": "id"
+						},
+						{
+							"key": "pageSize",
+							"value": "3"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "http://localhost:8081/template/product/productsAll",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8081/template/product/productsAll",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8081",
+					"path": [
+						"template",
+						"product",
+						"productsAll"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "http://localhost:8081/template/product/products?coloring=red&operator=moreThan&cottonPart=90",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8081/template/product/products?coloring=red&operator=moreThan&cottonPart=90",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8081",
+					"path": [
+						"template",
+						"product",
+						"products"
+					],
+					"query": [
+						{
+							"key": "coloring",
+							"value": "red"
+						},
+						{
+							"key": "operator",
+							"value": "moreThan"
+						},
+						{
+							"key": "cottonPart",
+							"value": "90"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
