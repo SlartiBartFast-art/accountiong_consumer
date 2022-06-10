@@ -6,33 +6,32 @@ import com.customer.accountingconsumer.model.SockResponse;
 import com.customer.accountingconsumer.utils.AppConstant;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.util.MultiValueMap;
+import org.springframework.http.*;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.server.ResponseStatusException;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Size;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import static org.springframework.http.HttpStatus.CREATED;
-import static org.springframework.http.HttpStatus.OK;
-
 @Data
 @RestController
-@RequestMapping(value = "/template/products")
+@RequestMapping(value = "/template/product")
 @AllArgsConstructor
 @Validated
 public class ProductController {
+
+    static final Logger LOGGER = LoggerFactory.getLogger(ProductController.class);
 
     private RestTemplate restTemplate;
 
@@ -56,23 +55,86 @@ public class ProductController {
             @RequestParam(value = "sortDir",
                     defaultValue = AppConstant.DEFAULT_SORT_DIRECTION, required = false) String sortDir
     ) {
-        return restTemplate.getForEntity
-                (AppConstant.API, SockResponse.class, pageNo, pageSize, sortBy, sortDir)
-                .getBody();
+        Map<String, String> params = new HashMap<>();
+        params.put("pageNo", Integer.toString(pageNo));
+        params.put("pageSize", Integer.toString(pageSize));
+        params.put("sortBy", sortBy);
+        params.put("sortDir", sortDir);
+        HttpHeaders headers = new HttpHeaders();
+        HttpEntity requestEntity = new HttpEntity<>(headers);
+        var result = Optional
+                .ofNullable(restTemplate.exchange(AppConstant.API_PAGINATION,
+                        HttpMethod.GET, requestEntity, new ParameterizedTypeReference<SockResponse>() {
+                        }, params));
+        if (!result.isPresent()) {
+            throw new ResponseStatusException(
+                    HttpStatus.INTERNAL_SERVER_ERROR,
+                    "We're sorry, server error, please try again later!");
+        }
+        return result.get().getBody();
     }
 
     /**
-     * find All Product
+     * Find All Product
      *
      * @return List<Sock>
      */
-    @GetMapping("/")
+    @GetMapping("/productsAll")
     public List<Sock> findAll() {
         return restTemplate.exchange(
                 AppConstant.API_ALL,
                 HttpMethod.GET, null, new ParameterizedTypeReference<List<Sock>>() {
                 }
         ).getBody();
+    }
+
+    /**
+     * Find all products matching the specified parameters
+     *
+     * @param coloring   Object Sock
+     * @param operator   not registered; "moreThan"; "lessThan";
+     * @param cottonPart as a percentage
+     * @return List<Sock>
+     */
+    @GetMapping("/products")
+    public List<Sock> findAllLike(@RequestParam("coloring")
+                                  @NotBlank(message = "Coloring must not be empty!")
+                                          String coloring,
+                                  @NotBlank(message = "Operator must not be empty!")
+                                  @RequestParam("operator")
+                                          String operator,
+                                  @RequestParam("cottonPart")
+                                  @NotBlank(message = "CottonPart must not be empty!")
+                                          String cottonPart) {
+        Map<String, String> products = new HashMap<>();
+        products.put("coloring", coloring);
+        products.put("operator", operator);
+        products.put("cottonPart", cottonPart);
+        HttpHeaders headers = new HttpHeaders();
+        HttpEntity requestEntity = new HttpEntity<>(headers);
+        var result = Optional
+                .ofNullable(restTemplate.exchange(AppConstant.API_FIND,
+                        HttpMethod.GET, requestEntity, new ParameterizedTypeReference<List<Sock>>() {
+                        }, products));
+
+        if (!result.isPresent()) {
+            throw new ResponseStatusException(
+                    HttpStatus.INTERNAL_SERVER_ERROR,
+                    "We're sorry, server error, please try again later!");
+        }
+        return result.get().getBody();
+    }
+
+    /**
+     * Get a Sock using its id
+     *
+     * @param id (int) Sock Object int DB
+     * @return ResponseEntity<Sock>
+     */
+    @GetMapping("/{id}")
+    public ResponseEntity<Sock> findProductById(@PathVariable("id") @Min(1) Long id) {
+        return restTemplate.getForEntity(AppConstant.API_ID,
+                Sock.class, id);
     }
 
     /**
@@ -94,57 +156,15 @@ public class ProductController {
     }
 
     /**
-     * Find all products matching the specified parameters
-     *
-     * @param coloring   Object Sock
-     * @param operator   not registered; "moreThan"; "lessThan";
-     * @param cottonPart as a percentage
-     * @return ResponseEntity<Sock [ ]>
-     */
-    @GetMapping("/socks")
-    public ResponseEntity<Sock[]> findAllLike(@RequestParam("coloring")
-                                              @NotBlank(message = "Coloring must not be empty!")
-                                                      String coloring,
-                                              @NotBlank(message = "Operator must not be empty!")
-                                              @RequestParam("operator")
-                                                      String operator,
-                                              @RequestParam("cottonPart")
-                                              @NotBlank(message = "CottonPart must not be empty!")
-                                                      String cottonPart) {
-        Optional<ResponseEntity<Sock[]>> rsl = Optional.of(
-                restTemplate.getForEntity(
-                        AppConstant.API_FIND, Sock[].class, coloring, operator, cottonPart
-                ));
-        if (!rsl.get().hasBody()) {
-            throw new ResponseStatusException(
-                    HttpStatus.INTERNAL_SERVER_ERROR,
-                    "We're sorry, server error, please try again later!");
-        }
-        return rsl.get();
-    }
-
-    /**
-     * Get a Sock using its id
-     *
-     * @param id (int) Sock Object int DB
-     * @return ResponseEntity<Sock>
-     */
-    @GetMapping("/{id}")
-    public ResponseEntity<Sock> findProductById(@Size(min = 1) @PathVariable Long id) {
-        return restTemplate.getForEntity(AppConstant.API_ID,
-                Sock.class, id);
-    }
-
-    /**
-     * //todo patch
      * Update one parameter in to Sock
-     * @param sock Object
+     *
+     * @param sock SockDtoPatch Object
      * @return ResponseEntity<Sock>
      */
     @PatchMapping("/")
     public ResponseEntity<Sock> patch(@Valid @RequestBody SockDtoPatch sock) {
-        var rsl = Optional.of(restTemplate
-                .patchForObject(AppConstant.API, sock, Sock.class));
+        var rsl = Optional
+                .of(restTemplate.postForEntity(AppConstant.API, sock, Sock.class));
         if (!rsl.get().hasBody()) {
             throw new ResponseStatusException(
                     HttpStatus.INTERNAL_SERVER_ERROR,
@@ -160,7 +180,7 @@ public class ProductController {
      * @return void
      */
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@Size(min = 1) @PathVariable int id) {
+    public ResponseEntity<Void> delete(@PathVariable("id") @Min(1) int id) {
         var sock = Optional
                 .ofNullable(restTemplate.getForEntity(AppConstant.API_ID,
                         Sock.class, id).getBody());
